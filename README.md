@@ -57,6 +57,7 @@ After installed successfully, load the plugin in Geany's plugin manager.
 Go to Tools and click on "Quick Open File". 
 Here a POP-UP will help you to find your file quickly, by typing some letters that are in the name.
 Then select the file by the arrows (up or down), type enter... or esc to dismiss the POP-UP
+<img src="http://s1.postimg.org/69i6bssof/qop_geany.png" alt="Geany Quick Open File Plugin" />
 </p>
 
 </div>
