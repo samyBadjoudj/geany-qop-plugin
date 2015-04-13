@@ -109,10 +109,9 @@ static gboolean callback_key_press (GtkWidget *widget, GdkEventKey  *event, gpoi
         if (gtk_tree_selection_get_selected(qop->tree_selection, &model, &iter))
         {
 
-            GValue index = G_VALUE_INIT;
-            g_value_init (&index, G_TYPE_INT);
-            gtk_tree_model_get (model, &iter, COL_IDX, &index, -1);
-            GeanyDocument * current_doc = document_index(g_value_get_int(&index));
+            gchar *  name = NULL;
+            gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
+            GeanyDocument * current_doc = document_find_by_real_path(name);
             document_grab_focus(current_doc);
             document_show_tab(current_doc);
         }
@@ -163,10 +162,10 @@ static void create_and_fill_model (struct quick_open_file *qop)
     for ( i= 0; i < geany->documents_array->len; i++)
     {
         GeanyDocument *current_doc = g_ptr_array_index (geany->documents_array, i);
-    
+
        if(current_doc->file_name){
                 gtk_list_store_append (store, &iter);
-                gtk_list_store_set (store, &iter, COL_NAME, current_doc->file_name, COL_IDX, current_doc->index, -1);
+                gtk_list_store_set (store, &iter, COL_NAME, current_doc->file_name, -1);
         }
 
     }
@@ -179,8 +178,6 @@ static void  create_view_and_model (struct quick_open_file *qop)
     qop->view = gtk_tree_view_new ();
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (qop->view), -1, "file_name", renderer, "text", COL_NAME, NULL);
-    renderer = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (qop->view), -1, "indey", renderer, "text", COL_IDX, NULL);
     create_and_fill_model (qop);
     qop->file_list_filter = gtk_tree_model_filter_new (qop->file_list,NULL);
     gtk_tree_view_set_model (GTK_TREE_VIEW (qop->view), qop->file_list_filter);
@@ -222,6 +219,5 @@ int launch_widget(const int window_size)
 
     return 0;
 }
-
 
 
