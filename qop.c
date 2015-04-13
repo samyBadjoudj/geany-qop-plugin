@@ -163,9 +163,12 @@ static void create_and_fill_model (struct quick_open_file *qop)
     for ( i= 0; i < geany->documents_array->len; i++)
     {
         GeanyDocument *current_doc = g_ptr_array_index (geany->documents_array, i);
+    
+       if(current_doc->file_name){
+                gtk_list_store_append (store, &iter);
+                gtk_list_store_set (store, &iter, COL_NAME, current_doc->file_name, COL_IDX, current_doc->index, -1);
+        }
 
-        gtk_list_store_append (store, &iter);
-        gtk_list_store_set (store, &iter, COL_NAME, current_doc->file_name, COL_IDX, current_doc->index, -1);
     }
 
     qop->file_list = GTK_TREE_MODEL (store);
