@@ -94,7 +94,6 @@ void plugin_cleanup(void)
 
 static gboolean callback_key_press (GtkWidget *widget, GdkEventKey  *event, gpointer   data)
 {
-    g_print("event: %u\n", event->keyval);
     struct quick_open_file * qop = data;
     GtkTreeModel     *model;
     GtkTreeIter       iter;
