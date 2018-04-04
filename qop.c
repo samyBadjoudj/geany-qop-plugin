@@ -28,11 +28,11 @@
 
 GeanyPlugin     *geany_plugin;
 GeanyData       *geany_data;
-GeanyFunctions  *geany_functions;
 static GtkWidget *main_menu_item = NULL;
 static const char * PLUGIN_NAME_QOP= "Quick Open File";
 static const int    WINDOW_SIZE= 500;
 
+int launch_widget(const int window_size);
 
 PLUGIN_VERSION_CHECK(1)
 PLUGIN_SET_INFO(PLUGIN_NAME_QOP, "Quick Open File (Edit->Pref.-> Key Bindings-> ","1.0", "Samy Badjoudj <samy.badjoudj@gmail.com>");
@@ -59,8 +59,6 @@ struct quick_open_file
     GtkWidget           *text_entry;
 
 } quick_open_file;
-
-PLUGIN_KEY_GROUP(PLUGIN_NAME_QOP, KB_COUNT)
 
 static void item_activate_cb(GtkMenuItem *menuitem, gpointer gdata)
 {
@@ -90,7 +88,26 @@ void plugin_cleanup(void)
 }
 
 
+static gboolean callback_button_press (GtkWidget *widget, GdkEventButton *event, gpointer   data)
+{
+    struct quick_open_file * qop = data;
+    GtkTreeModel     *model;
+    GtkTreeIter       iter;
+    if (event->button == 1) {
+        if (gtk_tree_selection_get_selected(qop->tree_selection, &model, &iter))
+        {
 
+            gchar *  name = NULL;
+            gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
+            GeanyDocument * current_doc = document_find_by_real_path(name);
+            document_open_file(current_doc->file_name, FALSE, NULL, NULL);
+        }
+        gtk_widget_destroy(qop->window);
+        g_free(qop);
+    }
+
+    return FALSE;
+}
 
 static gboolean callback_key_press (GtkWidget *widget, GdkEventKey  *event, gpointer   data)
 {
@@ -111,8 +128,7 @@ static gboolean callback_key_press (GtkWidget *widget, GdkEventKey  *event, gpoi
             gchar *  name = NULL;
             gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
             GeanyDocument * current_doc = document_find_by_real_path(name);
-            document_grab_focus(current_doc);
-            document_show_tab(current_doc);
+            document_open_file(current_doc->file_name, FALSE, NULL, NULL);
         }
         gtk_widget_destroy(qop->window);
         g_free(qop);
@@ -200,6 +216,7 @@ int launch_widget(const int window_size)
     create_view_and_model (qop);
     g_signal_connect (qop->window, "delete_event", G_CALLBACK(quit_qop), qop);
     g_signal_connect (qop->window, "key-press-event", G_CALLBACK(callback_key_press), qop);
+    g_signal_connect (qop->window, "button-press-event", G_CALLBACK(callback_button_press), qop);
     qop->tree_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(qop->view));
     g_signal_connect (qop->text_entry, "changed", G_CALLBACK(callback_update_visibilty_elements), qop);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(qop->view),FALSE);
