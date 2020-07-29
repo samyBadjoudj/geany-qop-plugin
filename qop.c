@@ -100,7 +100,9 @@ static gboolean callback_button_press (GtkWidget *widget, GdkEventButton *event,
             gchar *  name = NULL;
             gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
             GeanyDocument * current_doc = document_find_by_real_path(name);
-            document_open_file(current_doc->file_name, FALSE, NULL, NULL);
+            if (current_doc)
+                name=current_doc->file_name;
+            document_open_file(name, FALSE, NULL, NULL);
         }
         gtk_widget_destroy(qop->window);
         g_free(qop);
@@ -128,7 +130,9 @@ static gboolean callback_key_press (GtkWidget *widget, GdkEventKey  *event, gpoi
             gchar *  name = NULL;
             gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
             GeanyDocument * current_doc = document_find_by_real_path(name);
-            document_open_file(current_doc->file_name, FALSE, NULL, NULL);
+            if (current_doc)
+                name=current_doc->file_name;
+            document_open_file(name, FALSE, NULL, NULL);
         }
         gtk_widget_destroy(qop->window);
         g_free(qop);
