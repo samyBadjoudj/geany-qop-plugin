@@ -221,6 +221,7 @@ int launch_widget(const int window_size)
     g_signal_connect (qop->window, "delete_event", G_CALLBACK(quit_qop), qop);
     g_signal_connect (qop->window, "key-press-event", G_CALLBACK(callback_key_press), qop);
     g_signal_connect (qop->window, "button-press-event", G_CALLBACK(callback_button_press), qop);
+    gtk_window_set_title(GTK_WINDOW(qop->window), PLUGIN_NAME_QOP);
     qop->tree_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(qop->view));
     g_signal_connect (qop->text_entry, "changed", G_CALLBACK(callback_update_visibilty_elements), qop);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(qop->view),FALSE);
