@@ -100,7 +100,9 @@ static gboolean callback_button_press (GtkWidget *widget, GdkEventButton *event,
             gchar *  name = NULL;
             gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
             GeanyDocument * current_doc = document_find_by_real_path(name);
-            document_open_file(current_doc->file_name, FALSE, NULL, NULL);
+            if (current_doc)
+                name=current_doc->file_name;
+            document_open_file(name, FALSE, NULL, NULL);
         }
         gtk_widget_destroy(qop->window);
         g_free(qop);
@@ -128,7 +130,9 @@ static gboolean callback_key_press (GtkWidget *widget, GdkEventKey  *event, gpoi
             gchar *  name = NULL;
             gtk_tree_model_get (model, &iter, COL_NAME, &name, -1);
             GeanyDocument * current_doc = document_find_by_real_path(name);
-            document_open_file(current_doc->file_name, FALSE, NULL, NULL);
+            if (current_doc)
+                name=current_doc->file_name;
+            document_open_file(name, FALSE, NULL, NULL);
         }
         gtk_widget_destroy(qop->window);
         g_free(qop);
@@ -163,6 +167,13 @@ static int callback_update_visibilty_elements(GtkWidget *widget, gpointer   data
 {
     struct quick_open_file * qop = data;
     gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(qop->file_list_filter));
+    GtkTreePath *path = gtk_tree_path_new_from_indices(0, -1);
+    if (path)
+    {
+        gtk_tree_selection_select_path(qop->tree_selection, path);
+        gtk_tree_path_free(path);
+    }
+
     return 0;
 }
 
@@ -217,6 +228,7 @@ int launch_widget(const int window_size)
     g_signal_connect (qop->window, "delete_event", G_CALLBACK(quit_qop), qop);
     g_signal_connect (qop->window, "key-press-event", G_CALLBACK(callback_key_press), qop);
     g_signal_connect (qop->window, "button-press-event", G_CALLBACK(callback_button_press), qop);
+    gtk_window_set_title(GTK_WINDOW(qop->window), PLUGIN_NAME_QOP);
     qop->tree_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(qop->view));
     g_signal_connect (qop->text_entry, "changed", G_CALLBACK(callback_update_visibilty_elements), qop);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(qop->view),FALSE);
