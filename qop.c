@@ -167,6 +167,13 @@ static int callback_update_visibilty_elements(GtkWidget *widget, gpointer   data
 {
     struct quick_open_file * qop = data;
     gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(qop->file_list_filter));
+    GtkTreePath *path = gtk_tree_path_new_from_indices(0, -1);
+    if (path)
+    {
+        gtk_tree_selection_select_path(qop->tree_selection, path);
+        gtk_tree_path_free(path);
+    }
+
     return 0;
 }
 
